@@ -1,7 +1,24 @@
 import React from "react";
 
 export const Footer = () => {
+  const handleclick = ()=>{
+      window.open('https://wa.me/918736051236', '_blank');
+  }
   return (
+    <div>
+      {/* WhatsApp Banner */}
+        <div className='bg-white pt-12 pb-16 sm:pt-16 sm:pb-20 px-4 sm:px-6 lg:px-8'>
+          <div className='bg-[linear-gradient(0deg,_#037D01_0%,_#025C00_100%)] h-auto min-h-[8rem] sm:min-h-[10rem] md:min-h-[12rem] w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto px-6 py-6 sm:px-8 md:px-12 rounded-3xl sm:rounded-full flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 shadow-lg'>
+            <p className='text-center sm:text-left text-lg sm:text-xl md:text-2xl lg:text-3xl text-white poppins font-semibold leading-tight'>
+              Contact Us On Whatsapp
+            </p>
+            <button className='bg-white rounded-lg sm:rounded-xl px-4 py-2 sm:px-5 sm:py-2 md:px-6 text-sm sm:text-base md:text-lg poppins text-green-600 font-medium hover:bg-gray-100 transition duration-200 flex-shrink-0 whitespace-nowrap'
+            onClick={handleclick} >
+              Start Chat
+            </button>
+          </div>
+        </div>
+
     <footer className="bg-white text-black border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
         
@@ -68,6 +85,7 @@ export const Footer = () => {
         © {new Date().getFullYear()} Hawkar.in. All rights reserved.
       </div>
     </footer>
+    </div>
   );
 };
 
