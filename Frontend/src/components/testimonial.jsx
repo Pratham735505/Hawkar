@@ -6,21 +6,21 @@ const Testimonials = () => {
       id: 1,
       name: "Rajesh Kumar",
       city: "Mumbai",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      image: "https://media.istockphoto.com/id/1142192548/vector/man-avatar-profile-male-face-silhouette-or-icon-isolated-on-white-background-vector.jpg?s=612x612&w=0&k=20&c=DUKuRxK9OINHXt3_4m-GxraeoDDlhNuCbA9hp6FotFE=",
      
     },
     {
       id: 2,
       name: "Priya Sharma",
       city: "Delhi",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+      image: "https://cdn-icons-png.freepik.com/256/17932/17932358.png?semt=ais_white_label",
      
     },
     {
       id: 3,
       name: "Mohammed Ali",
       city: "Bangalore",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      image: "https://cdn-icons-png.freepik.com/256/17932/17932358.png?semt=ais_white_label",
      
     },
     {
