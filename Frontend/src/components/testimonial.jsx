@@ -20,14 +20,14 @@ const Testimonials = () => {
       id: 3,
       name: "Mohammed Ali",
       city: "Bangalore",
-      image: "https://cdn-icons-png.freepik.com/256/17932/17932358.png?semt=ais_white_label",
+      image: "https://media.istockphoto.com/id/1142192548/vector/man-avatar-profile-male-face-silhouette-or-icon-isolated-on-white-background-vector.jpg?s=612x612&w=0&k=20&c=DUKuRxK9OINHXt3_4m-GxraeoDDlhNuCbA9hp6FotFE=",
      
     },
     {
       id: 4,
       name: "Anita Patel",
       city: "Ahmedabad",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+      image: "https://cdn-icons-png.freepik.com/256/17932/17932358.png?semt=ais_white_label",
     
     }
   ];
