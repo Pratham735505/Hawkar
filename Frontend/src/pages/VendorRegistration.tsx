@@ -28,6 +28,10 @@ const VendorRegistration = () => {
     email: "",
     vendorType: "",
     subCategory: "",
+    fssaiLicense: "",
+    hasFSSAI: null,
+    vendingPermission: "",
+    hasVendingPermission: null,
   });
 
   const handleSendOTP = () => {
@@ -166,13 +170,133 @@ const VendorRegistration = () => {
       )}
 
       {formData.vendorType && formData.subCategory && (
-        <Card className="bg-primary/5 border-primary/20">
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">
-              In the next steps, you'll provide detailed information about your products, services, operating hours, and payment methods.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="pt-4">
+              <p className="text-sm text-muted-foreground">
+                In the next steps, you'll provide detailed information about your products, services, operating hours, and payment methods.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* FSSAI License for Food Businesses */}
+          {(formData.vendorType === "restaurant" || 
+            (formData.vendorType === "street-vendor" && formData.subCategory === "stable") ||
+            (formData.vendorType === "retail-store" && (formData.subCategory === "sweets" || formData.subCategory === "bakery"))) && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Do you have FSSAI License? <span className="text-destructive">*</span></Label>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, hasFSSAI: true, fssaiLicense: "" })}
+                    className={`flex-1 p-4 border-2 rounded-lg transition-all ${
+                      formData.hasFSSAI === true
+                        ? "border-primary bg-primary/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="font-medium">Yes, I have</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, hasFSSAI: false, fssaiLicense: "" })}
+                    className={`flex-1 p-4 border-2 rounded-lg transition-all ${
+                      formData.hasFSSAI === false
+                        ? "border-primary bg-primary/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="font-medium">No, I don't have</div>
+                  </button>
+                </div>
+              </div>
+
+              {formData.hasFSSAI === true && (
+                <div className="space-y-2">
+                  <Label htmlFor="fssai">FSSAI License Number <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="fssai"
+                    placeholder="Enter your FSSAI license number"
+                    value={formData.fssaiLicense}
+                    onChange={(e) => setFormData({ ...formData, fssaiLicense: e.target.value })}
+                  />
+                </div>
+              )}
+
+              {formData.hasFSSAI === false && (
+                <Card className="bg-amber-50 border-amber-200">
+                  <CardContent className="pt-4">
+                    <p className="text-sm text-amber-800 mb-2">
+                      FSSAI license is required for food businesses. We can help you get one!
+                    </p>
+                    <a href="#apply-fssai" className="text-sm text-primary hover:underline font-medium">
+                      Apply for FSSAI License →
+                    </a>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {/* Vending Permission */}
+          {formData.vendorType === "street-vendor" && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Do you have Vending Permission Letter? <span className="text-destructive">*</span></Label>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, hasVendingPermission: true, vendingPermission: "" })}
+                    className={`flex-1 p-4 border-2 rounded-lg transition-all ${
+                      formData.hasVendingPermission === true
+                        ? "border-primary bg-primary/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="font-medium">Yes, I have</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, hasVendingPermission: false, vendingPermission: "" })}
+                    className={`flex-1 p-4 border-2 rounded-lg transition-all ${
+                      formData.hasVendingPermission === false
+                        ? "border-primary bg-primary/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="font-medium">No, I don't have</div>
+                  </button>
+                </div>
+              </div>
+
+              {formData.hasVendingPermission === true && (
+                <div className="space-y-2">
+                  <Label htmlFor="vending">Vending Permission Number <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="vending"
+                    placeholder="Enter your vending permission number"
+                    value={formData.vendingPermission}
+                    onChange={(e) => setFormData({ ...formData, vendingPermission: e.target.value })}
+                  />
+                </div>
+              )}
+
+              {formData.hasVendingPermission === false && (
+                <Card className="bg-amber-50 border-amber-200">
+                  <CardContent className="pt-4">
+                    <p className="text-sm text-amber-800 mb-2">
+                      Don't worry! We'll help you get a vending permission letter.
+                    </p>
+                    <a href="/apply-vending-permission" className="text-sm text-primary hover:underline font-medium">
+                      Apply for Vending Permission Letter →
+                    </a>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -216,6 +340,13 @@ const VendorRegistration = () => {
       <Button 
         size="lg" 
         className="bg-gradient-to-r from-primary via-accent to-secondary text-white"
+        onClick={() => {
+          // Store registration data
+          const registrationData = JSON.stringify(formData);
+          sessionStorage.setItem('hawkar_registration', registrationData);
+          // Redirect to profile setup
+          window.location.href = '/complete-profile';
+        }}
       >
         Continue to Profile Setup
       </Button>
@@ -251,7 +382,7 @@ const VendorRegistration = () => {
                     </div>
                     {s < 3 && (
                       <div
-                        className={`w-16 h-1 mx-2 transition-all ${
+                        className={`w-16 h-1 mx-4 transition-all ${
                           step > s ? "bg-primary" : "bg-gray-200"
                         }`}
                       />

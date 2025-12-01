@@ -20,7 +20,7 @@ import Privacy from "./pages/Privacy";
 import Grievance from "./pages/Grievance";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
-
+import CompleteProfileSetup from "./pages/CompleteProfileSetup";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +37,7 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/vendor-enrollment" element={<VendorEnrollment />} />
             <Route path="/vendor-registration" element={<VendorRegistration />} />
+            <Route path="/complete-profile" element={<CompleteProfileSetup/>} />
             <Route path="/merchant-stories" element={<MerchantStories />} />
             <Route path="/built-with-hawkar" element={<BuiltWithHawkar />} />
             <Route path="/transformation" element={<Transformation />} />
