@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -13,230 +12,395 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, CheckCircle } from "lucide-react";
+import { CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 
 const VendorRegistration = () => {
   const { toast } = useToast();
+  const [step, setStep] = useState(1);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  
   const [formData, setFormData] = useState({
-    vendorName: "",
-    businessType: "",
-    phone: "",
-    location: "",
-    description: "",
-    termsAccepted: false,
+    mobile: "",
+    otp: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    vendorType: "",
+    subCategory: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.termsAccepted) {
+  const handleSendOTP = () => {
+    if (!formData.mobile || formData.mobile.length !== 10) {
       toast({
-        title: "Terms Required",
-        description: "Please accept the terms and conditions to continue.",
+        title: "Invalid Mobile Number",
+        description: "Please enter a valid 10-digit mobile number.",
         variant: "destructive",
       });
       return;
     }
-
+    setOtpSent(true);
     toast({
-      title: "Registration Submitted!",
-      description: "Thank you for registering. Our team will review your application and contact you within 24-48 hours.",
-    });
-
-    // Reset form
-    setFormData({
-      vendorName: "",
-      businessType: "",
-      phone: "",
-      location: "",
-      description: "",
-      termsAccepted: false,
+      title: "OTP Sent",
+      description: "Please check your mobile for the OTP code.",
     });
   };
 
-  return (
-    <div className="w-full">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center space-y-4">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold">
-              Vendor <span className="bg-gradient-hero bg-clip-text ">Registration</span>
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Join HAWKAR and start growing your business today
-            </p>
-          </div>
+  const handleVerifyOTP = () => {
+    if (!formData.otp || formData.otp.length !== 6) {
+      toast({
+        title: "Invalid OTP",
+        description: "Please enter the 6-digit OTP sent to your mobile.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setOtpVerified(true);
+    toast({
+      title: "OTP Verified",
+      description: "Your mobile number has been verified successfully.",
+    });
+  };
+
+  const handleNext = () => {
+    if (step === 1) {
+      if (!otpVerified) {
+        toast({
+          title: "Verification Required",
+          description: "Please verify your mobile number first.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (!formData.firstName || !formData.lastName || !formData.email) {
+        toast({
+          title: "Required Fields",
+          description: "Please fill in all required fields.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
+    if (step === 2) {
+      if (!formData.vendorType) {
+        toast({
+          title: "Select Business Type",
+          description: "Please select your business type to continue.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
+    setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    setStep(step - 1);
+  };
+
+  const renderVendorTypeSelection = () => (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Label>Select Your Business Type <span className="text-destructive">*</span></Label>
+        <Select
+          value={formData.vendorType}
+          onValueChange={(value) => {
+            setFormData({ ...formData, vendorType: value, subCategory: "" });
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Choose your business category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="street-vendor">Street Vendor</SelectItem>
+            <SelectItem value="restaurant">Restaurant</SelectItem>
+            <SelectItem value="retail-store">Retail Store</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {formData.vendorType === "street-vendor" && (
+        <div className="space-y-2">
+          <Label>Street Vendor Type <span className="text-destructive">*</span></Label>
+          <Select
+            value={formData.subCategory}
+            onValueChange={(value) => setFormData({ ...formData, subCategory: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select vendor type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="stable">Stable Vendor (Fixed Location)</SelectItem>
+              <SelectItem value="mobile">Mobile Vendor (Moving)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </section>
+      )}
 
-      {/* Registration Form */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <Card className="shadow-soft">
-              <CardHeader>
-                <CardTitle className="text-2xl font-heading">Registration Form</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Fill in your details to create your vendor account
-                </p>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Vendor Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="vendorName">
-                      Vendor Name <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="vendorName"
-                      placeholder="Enter your name or business name"
-                      value={formData.vendorName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, vendorName: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
+      {formData.vendorType === "retail-store" && (
+        <div className="space-y-2">
+          <Label>Store Type <span className="text-destructive">*</span></Label>
+          <Select
+            value={formData.subCategory}
+            onValueChange={(value) => setFormData({ ...formData, subCategory: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select store type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="kirana">Kirana Store</SelectItem>
+              <SelectItem value="medical">Medical Store</SelectItem>
+              <SelectItem value="book">Book Store</SelectItem>
+              <SelectItem value="gift-toy">Gift & Toy Shop</SelectItem>
+              <SelectItem value="dairy">Dairy Shop</SelectItem>
+              <SelectItem value="sweets">Sweet Shop</SelectItem>
+              <SelectItem value="bakery">Bakery</SelectItem>
+              <SelectItem value="hardware">Hardware Store</SelectItem>
+              <SelectItem value="electronics">Electronics Store</SelectItem>
+              <SelectItem value="repair">Repair Services</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-                  {/* Business Type */}
-                  <div className="space-y-2">
-                    <Label htmlFor="businessType">
-                      Business Type <span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={formData.businessType}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, businessType: value })
-                      }
-                      required
+      {formData.vendorType && formData.subCategory && (
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="pt-4">
+            <p className="text-sm text-muted-foreground">
+              In the next steps, you'll provide detailed information about your products, services, operating hours, and payment methods.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+
+  const renderSuccessMessage = () => (
+    <div className="text-center space-y-6 py-8">
+      <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+        <CheckCircle className="h-12 w-12 text-green-600" />
+      </div>
+      <div>
+        <h3 className="text-2xl font-heading font-bold mb-2">Registration Initiated!</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          Thank you for starting your registration with HAWKAR. You will now proceed to complete your detailed business profile.
+        </p>
+      </div>
+      
+      <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-none max-w-md mx-auto">
+        <CardContent className="pt-6">
+          <h4 className="font-heading font-semibold mb-4">Next Steps:</h4>
+          <ul className="space-y-3 text-sm text-left">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-1">1.</span>
+              <span>Complete your detailed business profile with products and services</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-1">2.</span>
+              <span>Set up your inventory and operating hours</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-1">3.</span>
+              <span>Add your bank account details for payments</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-1">4.</span>
+              <span>Review and submit for approval</span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Button 
+        size="lg" 
+        className="bg-gradient-to-r from-primary via-accent to-secondary text-white"
+      >
+        Continue to Profile Setup
+      </Button>
+    </div>
+  );
+
+  return (
+    <div className="w-full min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-heading font-bold mb-2">
+              Vendor <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">Registration</span>
+            </h1>
+            <p className="text-muted-foreground">Join HAWKAR and start growing your business today</p>
+          </div>
+
+          {/* Progress Steps */}
+          {step < 4 && (
+            <div className="mb-8">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                {[1, 2, 3].map((s) => (
+                  <div key={s} className="flex items-center">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                        step >= s
+                          ? "bg-primary text-white"
+                          : "bg-gray-200 text-gray-500"
+                      }`}
                     >
-                      <SelectTrigger id="businessType">
-                        <SelectValue placeholder="Select your business type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="street-vendor">Street Vendor</SelectItem>
-                        <SelectItem value="kirana-store">Kirana Store</SelectItem>
-                        <SelectItem value="restaurant">Restaurant</SelectItem>
-                        <SelectItem value="retail-shop">Retail Shop</SelectItem>
-                        <SelectItem value="ferry-vendor">Ferry Vendor</SelectItem>
-                        <SelectItem value="local-market">Local Market Stall</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      {s}
+                    </div>
+                    {s < 3 && (
+                      <div
+                        className={`w-16 h-1 mx-2 transition-all ${
+                          step > s ? "bg-primary" : "bg-gray-200"
+                        }`}
+                      />
+                    )}
                   </div>
+                ))}
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground max-w-md mx-auto">
+                <span>Account Setup</span>
+                <span>Business Type</span>
+                <span>Confirmation</span>
+              </div>
+            </div>
+          )}
 
-                  {/* Phone Number */}
+          {/* Form Card */}
+          <Card className="shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl font-heading">
+                {step === 1 && "Create Your Account"}
+                {step === 2 && "Select Business Type"}
+                {step === 3 && "Confirm Details"}
+                {step === 4 && "Success!"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {step === 1 && (
+                <div className="space-y-6">
+                  {/* Mobile Number */}
                   <div className="space-y-2">
-                    <Label htmlFor="phone">
-                      Phone Number <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="Enter your mobile number"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-
-                  {/* Location */}
-                  <div className="space-y-2">
-                    <Label htmlFor="location">
-                      Vending Location <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="location"
-                      placeholder="Enter your primary vending location"
-                      value={formData.location}
-                      onChange={(e) =>
-                        setFormData({ ...formData, location: e.target.value })
-                      }
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      e.g., "Near City Mall, Hazratganj" or "Main Market, Aminabad"
-                    </p>
-                  </div>
-
-                  {/* Business Description */}
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Business Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Tell us about your business and what products you sell"
-                      value={formData.description}
-                      onChange={(e) =>
-                        setFormData({ ...formData, description: e.target.value })
-                      }
-                      rows={4}
-                    />
-                  </div>
-
-                  {/* ID Proof Upload */}
-                  <div className="space-y-2">
-                    <Label htmlFor="idProof">
-                      ID Proof Upload <span className="text-destructive">*</span>
-                    </Label>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
-                      <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Click to upload or drag and drop
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Aadhaar, PAN, Voter ID, or any govt-issued ID (Max 5MB)
-                      </p>
+                    <Label htmlFor="mobile">Mobile Number <span className="text-destructive">*</span></Label>
+                    <div className="flex gap-2">
                       <Input
-                        id="idProof"
-                        type="file"
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        required
+                        id="mobile"
+                        type="tel"
+                        placeholder="Enter 10-digit mobile number"
+                        value={formData.mobile}
+                        onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                        maxLength={10}
+                        disabled={otpVerified}
+                        className="flex-1"
+                      />
+                      {!otpSent && !otpVerified && (
+                        <Button onClick={handleSendOTP} variant="outline">
+                          Send OTP
+                        </Button>
+                      )}
+                      {otpVerified && (
+                        <Button disabled variant="outline" className="bg-green-50">
+                          <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                          Verified
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* OTP Input */}
+                  {otpSent && !otpVerified && (
+                    <div className="space-y-2">
+                      <Label htmlFor="otp">Enter OTP <span className="text-destructive">*</span></Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="otp"
+                          type="text"
+                          placeholder="Enter 6-digit OTP"
+                          value={formData.otp}
+                          onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
+                          maxLength={6}
+                          className="flex-1"
+                        />
+                        <Button onClick={handleVerifyOTP}>
+                          Verify
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Didn't receive OTP? <button className="text-primary hover:underline">Resend</button>
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name <span className="text-destructive">*</span></Label>
+                      <Input
+                        id="firstName"
+                        placeholder="Enter first name"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name <span className="text-destructive">*</span></Label>
+                      <Input
+                        id="lastName"
+                        placeholder="Enter last name"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                       />
                     </div>
                   </div>
 
-                  {/* Shop Photos Upload */}
+                  {/* Email */}
                   <div className="space-y-2">
-                    <Label htmlFor="shopPhotos">
-                      Shop/Cart Photos <span className="text-destructive">*</span>
-                    </Label>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
-                      <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Click to upload or drag and drop
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Clear photos of your shop, cart, or stall (Max 5MB each)
-                      </p>
-                      <Input
-                        id="shopPhotos"
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="hidden"
-                        required
-                      />
+                    <Label htmlFor="email">Email Address <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {step === 2 && renderVendorTypeSelection()}
+
+              {step === 3 && (
+                <div className="space-y-6">
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Name:</span>
+                      <span className="font-medium">{formData.firstName} {formData.lastName}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Mobile:</span>
+                      <span className="font-medium">{formData.mobile}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Email:</span>
+                      <span className="font-medium">{formData.email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Business Type:</span>
+                      <span className="font-medium capitalize">{formData.vendorType?.replace("-", " ")}</span>
+                    </div>
+                    {formData.subCategory && (
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Category:</span>
+                        <span className="font-medium capitalize">{formData.subCategory?.replace("-", " ")}</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Terms and Conditions */}
-                  <div className="flex items-start space-x-3">
-                    <Checkbox
-                      id="terms"
-                      checked={formData.termsAccepted}
-                      onCheckedChange={(checked) =>
-                        setFormData({ ...formData, termsAccepted: checked as boolean })
-                      }
-                    />
+                  <div className="flex items-start space-x-3 p-4 bg-primary/5 rounded-lg">
+                    <Checkbox id="terms" />
                     <div className="space-y-1">
-                      <Label
-                        htmlFor="terms"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
+                      <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
                         I accept the terms and conditions
                       </Label>
                       <p className="text-xs text-muted-foreground">
@@ -244,51 +408,69 @@ const VendorRegistration = () => {
                       </p>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* Submit Button */}
+              {step === 4 && renderSuccessMessage()}
+
+              {/* Navigation Buttons */}
+              {step < 4 && (
+                <div className="flex gap-3 mt-8">
+                  {step > 1 && (
+                    <Button
+                      variant="outline"
+                      onClick={handleBack}
+                      className="flex-1"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Back
+                    </Button>
+                  )}
                   <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full gradient-hero"
+                    onClick={handleNext}
+                    className="flex-1 bg-gradient-to-r from-primary via-accent to-secondary text-white"
                   >
-                    Submit Registration
+                    {step === 3 ? "Submit Registration" : "Continue"}
+                    <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
-                </form>
-              </CardContent>
-            </Card>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-            {/* Info Card */}
-            <Card className="mt-8 shadow-soft bg-gradient-to-br from-primary/5 to-accent/5 border-none">
+          {/* Help Text */}
+          {step < 4 && (
+            <Card className="mt-6 bg-gradient-to-br from-primary/5 to-accent/5 border-none">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <CheckCircle className="h-8 w-8 text-primary flex-shrink-0" />
+                  <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
                   <div>
-                    <h3 className="font-heading font-semibold mb-2">What Happens Next?</h3>
+                    <h3 className="font-heading font-semibold mb-2">What Happens After Registration?</h3>
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
-                        <span>Our team will review your application within 24-48 hours</span>
+                        <span>Complete your detailed business profile with inventory</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
-                        <span>We'll verify your documents and contact you via phone</span>
+                        <span>Add your bank account details to activate payments</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
-                        <span>If you need licensing help, our legal team will assist you</span>
+                        <span>Our team will review and approve within 24-48 hours</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
-                        <span>Once approved, you'll receive login credentials to start</span>
+                        <span>Start accepting orders and grow your business!</span>
                       </li>
                     </ul>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          )}
         </div>
-      </section>
+      </div>
     </div>
   );
 };
